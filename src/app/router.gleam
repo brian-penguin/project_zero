@@ -33,7 +33,7 @@ const base_app_html = "<!DOCTYPE html>
   </head>
   <body>
     <div id=\"app\">
-        Hello, World!
+        <span class=\"title\"> Hello, World! </span>
     </div>
     <script src=\"/static/main.js\"></script>
   </body>
