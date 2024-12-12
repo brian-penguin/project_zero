@@ -1,81 +1,81 @@
+import app/router
+import app/web.{type Context, Context}
+import gleam/string
 import gleeunit
 import gleeunit/should
+import project_zero
 import wisp/testing
-import app/router
 
 pub fn main() {
-    gleeunit.main()
+  gleeunit.main()
 }
 
-// Happy Path
+// TODO: What is this called?
+// - I want to call this currying? partial application? Idk the difference?
+fn with_context(testcase: fn(Context) -> tc) -> tc {
+  let context = Context(static_directory: project_zero.static_directory())
+  testcase(context)
+}
+
+// Happy Path for our Homepage
 pub fn get_home_page_test() {
-    let request = testing.get("/", [])
-    let response = router.handle_request(request)
+  use ctx <- with_context
+  let request = testing.get("/", [])
+  let response = router.handle_request(request, ctx)
 
-    response.status
-    |> should.equal(200)
+  response.status
+  |> should.equal(200)
 
-    response.headers
-    |> should.equal([#("content-type", "text/html; charset=utf-8")])
+  response.headers
+  |> should.equal([#("content-type", "text/html; charset=utf-8")])
 
+  let response_string =
     response
     |> testing.string_body
-    |> should.equal("Hello, World!")
+
+  should.be_true(string.contains(response_string, "Hello, World!"))
 }
 
 // Test that we don't allow random posts
 pub fn post_home_page_test() {
-    let request = testing.post("/", [], "random post body")
-    let response = router.handle_request(request)
+  use ctx <- with_context
+  let request = testing.post("/", [], "random post body")
+  let response = router.handle_request(request, ctx)
 
-    response.status
-    |> should.equal(405)
+  response.status
+  |> should.equal(405)
 }
 
 // Test that our 404 page works
 pub fn page_not_found_test() {
-    let request = testing.get("/nothing-here", [])
-    let response = router.handle_request(request)
+  use ctx <- with_context
+  let request = testing.get("/nothing-here", [])
+  let response = router.handle_request(request, ctx)
 
-    response.status
-    |> should.equal(404)
+  response.status
+  |> should.equal(404)
 }
 
-// Lets try it out with Comments
-pub fn get_comments_test() {
-    let request = testing.get("/comments", [])
-    let response = router.handle_request(request)
+pub fn get_stylesheet_test() {
+  use ctx <- with_context
+  let request = testing.get("/static/styles.css", [])
+  let response = router.handle_request(request, ctx)
 
-    response.status
-    |> should.equal(200)
-    // I'm not sure how to test that like html looks right?
+  response.status
+  |> should.equal(200)
 
+  response.headers
+  |> should.equal([#("content-type", "text/css; charset=utf-8")])
 }
 
-pub fn get_comment_test() {
-    let request = testing.get("/comments/123", [])
-    let response = router.handle_request(request)
+pub fn get_javascript_test() {
+  use ctx <- with_context
+  let request = testing.get("/static/main.js", [])
+  let response = router.handle_request(request, ctx)
 
-    response.status
-    |> should.equal(200)
-    response
-    |> testing.string_body
-    |> should.equal("Comment with id 123")
+  response.status
+  |> should.equal(200)
+
+  response.headers
+  |> should.equal([#("content-type", "text/javascript; charset=utf-8")])
 }
-
-pub fn update_comment_test() {
-    let request = testing.put("/comments/123", [], "hi")
-    let response = router.handle_request(request)
-
-    should.equal(response.status, 405)
-}
-
-pub fn delete_comment_test() {
-    let request = testing.delete("/comments/123", [], "")
-    let response = router.handle_request(request)
-
-    should.equal(response.status, 405)
-}
-
-
-
