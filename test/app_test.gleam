@@ -40,3 +40,42 @@ pub fn page_not_found_test() {
     response.status
     |> should.equal(404)
 }
+
+// Lets try it out with Comments
+pub fn get_comments_test() {
+    let request = testing.get("/comments", [])
+    let response = router.handle_request(request)
+
+    response.status
+    |> should.equal(200)
+    // I'm not sure how to test that like html looks right?
+
+}
+
+pub fn get_comment_test() {
+    let request = testing.get("/comments/123", [])
+    let response = router.handle_request(request)
+
+    response.status
+    |> should.equal(200)
+    response
+    |> testing.string_body
+    |> should.equal("Comment with id 123")
+}
+
+pub fn update_comment_test() {
+    let request = testing.put("/comments/123", [], "hi")
+    let response = router.handle_request(request)
+
+    should.equal(response.status, 405)
+}
+
+pub fn delete_comment_test() {
+    let request = testing.delete("/comments/123", [], "")
+    let response = router.handle_request(request)
+
+    should.equal(response.status, 405)
+}
+
+
+
