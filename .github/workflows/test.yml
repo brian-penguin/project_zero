@@ -1,9 +1,8 @@
-name: test
+name: gleam-test
 
 on:
   push:
     branches:
-      - master
       - main
   pull_request:
 
@@ -18,6 +17,15 @@ jobs:
           gleam-version: "1.6.3"
           rebar3-version: "3"
           # elixir-version: "1.15.4"
+      - name: Cache Gleam dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/gleam
+            ~/.cache/hex
+          key: ${{ runner.os }}-gleam-${{ hashFiles('manifest.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-gleam-
       - run: gleam deps download
       - run: gleam test
       - run: gleam format --check src test
