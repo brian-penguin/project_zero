@@ -14,6 +14,9 @@ pub fn main() {
 }
 ```
 
+## Development
+There's a makefile which runs the dev server and restarts each file change. It requires [watchexec](https://github.com/watchexec/watchexec)
+
 Further documentation can be found at <https://hexdocs.pm/project_zero>.
 
 ## Development
