@@ -10,6 +10,13 @@ pub fn handle_request(req: Request, ctx: web.Context) -> Response {
 
   case wisp.path_segments(req) {
     [] -> home_page(req, ctx)
+
+    // Handle Empty Responses -> These are configured by our global middleware
+    ["internal-server-error"] -> wisp.internal_server_error()
+    ["unprocessable-entity"] -> wisp.unprocessable_entity()
+    ["method-not-allowed"] -> wisp.method_not_allowed([])
+    ["entity-too-large"] -> wisp.entity_too_large()
+    ["bad-request"] -> wisp.bad_request()
     _ -> wisp.not_found()
   }
 }
