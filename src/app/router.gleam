@@ -26,10 +26,10 @@ pub fn handle_request(req: Request, ctx: web.Context) -> Response {
 fn home_page(req: Request, _ctx: web.Context) -> Response {
   use <- wisp.require_method(req, Get)
 
-  let html = [pages.home()]
+  let html =
+    [pages.home()]
     |> layout
     |> element.to_document_string_builder
-
 
   wisp.ok()
   |> wisp.html_body(html)
