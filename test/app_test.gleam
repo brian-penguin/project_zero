@@ -33,7 +33,7 @@ pub fn get_home_page_test() {
     response
     |> testing.string_body
 
-  should.be_true(string.contains(response_string, "Hello, World!"))
+  should.be_true(string.contains(response_string, "Homepage"))
 }
 
 // Test that we don't allow random posts

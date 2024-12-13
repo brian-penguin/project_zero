@@ -1,4 +1,6 @@
-import gleam/string_tree
+import app/pages
+import app/pages/layout.{layout}
+import lustre/element
 import wisp.{type Request, type Response}
 
 // https://hexdocs.pm/gleam_stdlib/gleam/string_tree.html
@@ -24,25 +26,11 @@ pub fn handle_request(req: Request, ctx: web.Context) -> Response {
 fn home_page(req: Request, _ctx: web.Context) -> Response {
   use <- wisp.require_method(req, Get)
 
-  let html = string_tree.from_string(base_app_html)
+  let html =
+    [pages.home()]
+    |> layout
+    |> element.to_document_string_builder
 
   wisp.ok()
   |> wisp.html_body(html)
 }
-
-const base_app_html = "<!DOCTYPE html>
-<html lang=\"en\">
-  <head>
-    <meta charset=\"utf-8\">
-    <title>Project Zero</title>
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
-    <link rel=\"stylesheet\" href=\"/static/styles.css\">
-  </head>
-  <body>
-    <div id=\"app\">
-        <span class=\"title\"> Hello, World! </span>
-    </div>
-    <script src=\"/static/main.js\"></script>
-  </body>
-</html>
-"
