@@ -3,6 +3,8 @@
 // and probably anything we need to build out a default context
 import app/router
 import app/web.{Context}
+import dot_env
+import dot_env/env
 import gleam/erlang/process
 
 // How we are going to run this webserver
@@ -15,9 +17,12 @@ import wisp/wisp_mist
 pub fn main() {
   wisp.configure_logger()
 
-  // TODO: Generate this one time and load at the start so we don't change this each restart
-  //      - There might be a like dotenv equivalent
-  let secret_key_base = wisp.random_string(64)
+  dot_env.new()
+  |> dot_env.set_path(".env")
+  |> dot_env.set_debug(False)
+  |> dot_env.load
+
+  let assert Ok(secret_key_base) = env.get_string("SECRET_KEY_BASE")
 
   let ctx = Context(static_directory: static_directory())
 
