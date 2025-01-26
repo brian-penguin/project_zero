@@ -24,7 +24,7 @@ pub fn main() {
 
   let assert Ok(secret_key_base) = env.get_string("SECRET_KEY_BASE")
 
-  let ctx = Context(static_directory: static_directory())
+  let ctx = Context(static_directory: static_directory(), todo_items: [])
 
   // Partially apply the router.handle_request fn with our ctx
   let handler = router.handle_request(_, ctx)

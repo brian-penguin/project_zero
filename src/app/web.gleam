@@ -1,9 +1,11 @@
 import gleam/bool
 import gleam/string_tree
 import wisp
+import app/models/todo_item.{type TodoItem}
 
 pub type Context {
-  Context(static_directory: String)
+  // TODO BRIAN, is this like how we pass all context around?
+  Context(static_directory: String, todo_items: List(TodoItem))
 }
 
 // This is our middleware stack for everything that goes through our "web" request_handler function

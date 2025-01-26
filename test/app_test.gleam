@@ -13,7 +13,7 @@ pub fn main() {
 // TODO: What is this called?
 // - I want to call this currying? partial application? Idk the difference?
 fn with_context(testcase: fn(Context) -> tc) -> tc {
-  let context = Context(static_directory: project_zero.static_directory())
+  let context = Context(static_directory: project_zero.static_directory(), todo_items: [])
   testcase(context)
 }
 

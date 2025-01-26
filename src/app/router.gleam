@@ -36,11 +36,11 @@ fn home_page(req: Request, _ctx: web.Context) -> Response {
   |> wisp.html_body(html)
 }
 
-fn todo_page(req: Request, _ctx: web.Context) -> Response {
+fn todo_page(req: Request, ctx: web.Context) -> Response {
     use <- wisp.require_method(req, Get)
 
     let html =
-        [pages.todos()]
+        [pages.todos(ctx.todo_items)]
         |> layout
         |> element.to_document_string_builder
     wisp.ok()
