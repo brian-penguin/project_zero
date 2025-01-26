@@ -12,6 +12,7 @@ pub fn handle_request(req: Request, ctx: web.Context) -> Response {
 
   case wisp.path_segments(req) {
     [] -> home_page(req, ctx)
+    ["todos"] -> todo_page(req, ctx)
 
     // Handle Empty Responses -> These are configured by our global middleware
     ["internal-server-error"] -> wisp.internal_server_error()
@@ -33,4 +34,15 @@ fn home_page(req: Request, _ctx: web.Context) -> Response {
 
   wisp.ok()
   |> wisp.html_body(html)
+}
+
+fn todo_page(req: Request, _ctx: web.Context) -> Response {
+    use <- wisp.require_method(req, Get)
+
+    let html =
+        [pages.todos()]
+        |> layout
+        |> element.to_document_string_builder
+    wisp.ok()
+    |> wisp.html_body(html)
 }
