@@ -14,7 +14,11 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
         attribute.rel("stylesheet"),
         attribute.href("/static/styles.css"),
       ]),
+      html.link([
+        attribute.rel("stylesheet"),
+        attribute.href("/static/fonts.css"),
+      ]),
     ]),
-    html.body([], elements),
+    html.body([attribute.id("app")], elements),
   ])
 }
