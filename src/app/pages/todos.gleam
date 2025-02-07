@@ -32,7 +32,7 @@ fn todo_items_input() -> Element(t) {
       class("add-todo-item-input"),
       class("font-gothic"),
       attribute.method("POST"),
-      attribute.action("/items/create"),
+      attribute.action("/todo_items"),
     ],
     [
       input([
