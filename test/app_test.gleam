@@ -65,7 +65,7 @@ pub fn get_stylesheet_test() {
   |> should.equal(200)
 
   response.headers
-  |> should.equal([#("content-type", "text/css; charset=utf-8")])
+  |> should.equal([#("content-type", "text/css; charset=utf-8"), #("etag", "664-67C1E11B")])
 }
 
 pub fn get_javascript_test() {
@@ -77,5 +77,5 @@ pub fn get_javascript_test() {
   |> should.equal(200)
 
   response.headers
-  |> should.equal([#("content-type", "text/javascript; charset=utf-8")])
+  |> should.equal([#("content-type", "text/javascript; charset=utf-8"), #("etag", "1B-675C658C")])
 }
