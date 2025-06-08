@@ -13,7 +13,8 @@ pub fn main() {
 // TODO: What is this called?
 // - I want to call this currying? partial application? Idk the difference?
 fn with_context(testcase: fn(Context) -> tc) -> tc {
-  let context = Context(static_directory: project_zero.static_directory(), todo_items: [])
+  let context =
+    Context(static_directory: project_zero.static_directory(), todo_items: [])
   testcase(context)
 }
 
@@ -33,7 +34,7 @@ pub fn get_home_page_test() {
     response
     |> testing.string_body
 
-  should.be_true(string.contains(response_string, "Homepage"))
+  assert string.contains(response_string, "Homepage")
 }
 
 // Test that we don't allow random posts
@@ -42,8 +43,7 @@ pub fn post_home_page_test() {
   let request = testing.post("/", [], "random post body")
   let response = router.handle_request(request, ctx)
 
-  response.status
-  |> should.equal(405)
+  assert response.status == 405
 }
 
 // Test that our 404 page works
@@ -52,8 +52,7 @@ pub fn page_not_found_test() {
   let request = testing.get("/nothing-here", [])
   let response = router.handle_request(request, ctx)
 
-  response.status
-  |> should.equal(404)
+  assert response.status == 404
 }
 
 pub fn get_stylesheet_test() {
@@ -61,11 +60,9 @@ pub fn get_stylesheet_test() {
   let request = testing.get("/static/styles.css", [])
   let response = router.handle_request(request, ctx)
 
-  response.status
-  |> should.equal(200)
-
-  response.headers
-  |> should.equal([#("content-type", "text/css; charset=utf-8"), #("etag", "664-67C1E11B")])
+  assert response.status == 200
+  assert response.headers
+    == [#("content-type", "text/css; charset=utf-8"), #("etag", "664-67C1E11B")]
 }
 
 pub fn get_javascript_test() {
@@ -73,9 +70,11 @@ pub fn get_javascript_test() {
   let request = testing.get("/static/main.js", [])
   let response = router.handle_request(request, ctx)
 
-  response.status
-  |> should.equal(200)
+  assert response.status == 200
 
-  response.headers
-  |> should.equal([#("content-type", "text/javascript; charset=utf-8"), #("etag", "1B-675C658C")])
+  assert response.headers
+    == [
+      #("content-type", "text/javascript; charset=utf-8"),
+      #("etag", "1B-675C658C"),
+    ]
 }
