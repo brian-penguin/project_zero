@@ -1,7 +1,7 @@
 import app/models/todo_item.{type TodoItem, create_todo_item}
 import app/web.{type Context, Context}
-import gleam/dynamic
 import gleam/json
+import gleam/dynamic/decode
 import gleam/list
 import gleam/option.{Some}
 import wisp.{type Request, type Response}
@@ -24,16 +24,14 @@ pub fn todo_items_middleware(
     // We are just using a cookie for storage right now but we will want to change this later to something else
     case wisp.get_cookie(req, "todo_items", wisp.PlainText) {
       Ok(json_string) -> {
-        let decoder =
-          dynamic.decode3(
-            TodoItemsJson,
-            dynamic.field("id", dynamic.string),
-            dynamic.field("title", dynamic.string),
-            dynamic.field("complete", dynamic.bool),
-          )
-          |> dynamic.list
+        let todo_decoder = {
+          use id <- decode.field("id", decode.string)
+          use title <- decode.field("title", decode.string)
+          use complete <- decode.field("complete", decode.bool)
+          decode.success(TodoItemsJson(id:, title:, complete:))
+        }
 
-        let result = json.decode(json_string, decoder)
+        let result = json.parse(json_string, decode.list(of: todo_decoder))
         case result {
           Ok(todo_items) -> todo_items
           Error(_) -> []

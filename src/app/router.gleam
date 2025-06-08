@@ -30,7 +30,7 @@ fn home_page(req: Request, _ctx: web.Context) -> Response {
   let html =
     [pages.home()]
     |> layout
-    |> element.to_document_string_builder
+    |> element.to_document_string_tree
 
   wisp.ok()
   |> wisp.html_body(html)
@@ -45,24 +45,23 @@ fn todo_items_handler(req: Request, ctx: web.Context) -> Response {
 }
 
 fn todo_items_page(req: Request, ctx: web.Context) -> Response {
-    use <- wisp.require_method(req, Get)
+  use <- wisp.require_method(req, Get)
 
-    let html =
-        [pages.todos(ctx.todo_items)]
-        |> layout
-        |> element.to_document_string_builder
-    wisp.ok()
-    |> wisp.html_body(html)
+  let html =
+    [pages.todos(ctx.todo_items)]
+    |> layout
+    |> element.to_document_string_tree
+  wisp.ok()
+  |> wisp.html_body(html)
 }
 
 fn create_todo_items(req: Request, ctx: web.Context) -> Response {
-    use <- wisp.require_method(req, Post)
+  use <- wisp.require_method(req, Post)
 
-    let html =
-        [pages.todos(ctx.todo_items)]
-        |> layout
-        |> element.to_document_string_builder
-    wisp.ok()
-    |> wisp.html_body(html)
+  let html =
+    [pages.todos(ctx.todo_items)]
+    |> layout
+    |> element.to_document_string_tree
+  wisp.ok()
+  |> wisp.html_body(html)
 }
-
