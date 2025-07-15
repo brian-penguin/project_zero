@@ -112,3 +112,21 @@ html {
 .font-gothic {
   font-family: "bu Gothic Hybrid";
 }
+
+.add-todo-item-input__input {
+  width: auto;
+}
+
+.todo-item__inner {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: right;
+}
+.todo-item__inner:first-child {
+  margin-right: auto;
+}
+
+.todo-item__inner button {
+  font-size: 0.5em;
+  margin: 2px;
+}
