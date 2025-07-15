@@ -13,7 +13,7 @@ pub fn root(todo_items: List(TodoItem)) -> Element(t) {
 }
 
 fn todo_item_elements(todo_items: List(TodoItem)) -> Element(t) {
-  div([class("todo-items")], [
+  div([class("todo-items"), class("font-gothic")], [
     todo_items_input(),
     div([class("todo-items__inner")], [
       div(
@@ -36,7 +36,7 @@ fn todo_items_input() -> Element(t) {
     ],
     [
       input([
-        name("todo_title"),
+        name("todo_item_title"),
         class("add-todo-item-input__input"),
         placeholder("What do you need to do?"),
         autofocus(True),
@@ -49,12 +49,13 @@ fn todo_item(todo_item: TodoItem) -> Element(t) {
   let completed_css_class: String = {
     case todo_item.status {
       todo_item.Complete -> "todo-item__complete"
-      todo_item.Incomplete -> ""
+      todo_item.Incomplete -> "todo-item__incomplete"
     }
   }
 
   div([class("todo-item" <> completed_css_class)], [
     div([class("todo-item__inner")], [
+      span([class("todo-item__title")], [text(todo_item.title)]),
       form(
         [
           attribute.method("POST"),
@@ -63,17 +64,16 @@ fn todo_item(todo_item: TodoItem) -> Element(t) {
             "/todo_items/" <> todo_item.id <> "/complete?_method=PATCH",
           ),
         ],
-        [button([class("todo-item__button")], [svg_icon_checked()])],
+        [button([class("todo-item__button")], [text("complete")])],
       ),
-      span([class("todo-item__title")], [svg_icon_checked()]),
+      form(
+        [
+          attribute.method("POST"),
+          attribute.action("/todo_items/" <> todo_item.id <> "?_method=DELETE"),
+        ],
+        [button([class("todo__delete")], [text("delete")])],
+      ),
     ]),
-    form(
-      [
-        attribute.method("POST"),
-        attribute.action("/todo_items/" <> todo_item.id <> "?_method=DELETE"),
-      ],
-      [button([class("todo__delete")], [svg_icon_delete()])],
-    ),
   ])
 }
 
@@ -81,6 +81,7 @@ fn todo_items_empty() -> Element(t) {
   div([class("todo-items__empty")], [])
 }
 
+// TODO: these don't look right. Leaving out for now
 fn svg_icon_checked() -> Element(t) {
   svg(
     [class("todo__checked-icon"), attribute.attribute("viewBox", "0 0 24 24")],
