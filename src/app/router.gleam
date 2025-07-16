@@ -2,6 +2,7 @@ import app/models/todo_item
 import app/pages
 import app/pages/layout.{layout}
 import app/routes/todo_item_routes.{todo_items_middleware}
+import gleam/io
 import gleam/json
 import gleam/list
 import gleam/option.{None}
@@ -17,6 +18,8 @@ import gleam/http.{Get, Post}
 pub fn handle_request(req: Request, ctx: web.Context) -> Response {
   use req <- web.middleware(req, ctx)
   use ctx <- todo_items_middleware(req, ctx)
+
+  io.println(string.inspect(req))
 
   case wisp.path_segments(req) {
     [] -> home_page(req, ctx)
@@ -76,8 +79,9 @@ fn create_todo_items(req: Request, ctx: web.Context) -> Response {
     ))
     let new_todo_item = todo_item.create_todo_item(None, todo_item_title, False)
 
-    let new_todo_items = list.append(current_todo_items, [new_todo_item])
-    |> todo_items_to_json
+    let new_todo_items =
+      list.append(current_todo_items, [new_todo_item])
+      |> todo_items_to_json
 
     Ok(new_todo_items)
   }
@@ -102,7 +106,7 @@ fn create_todo_items(req: Request, ctx: web.Context) -> Response {
 // Feels like it should be a serializer?
 // Helper item for creating the json to store in our cookie
 fn todo_items_to_json(items: List(todo_item.TodoItem)) -> String {
- "["
+  "["
   <> items
   |> list.map(todo_item_to_json)
   |> string.join(",")

@@ -8,7 +8,7 @@ import lustre/element/svg
 pub fn root(todo_items: List(TodoItem)) -> Element(t) {
   div([class("todo-items-page"), class("font-gothic")], [
     div([class("page-title-container")], [
-      h1([class("font-gothic"), class("page-title")], [text("Todos")]),
+      h1([class("font-gothic"), class("page-title")], [text("Todo")]),
     ]),
     todo_items_input(),
     todo_item_elements(todo_items),

@@ -5,7 +5,6 @@ import gleam/io
 import gleam/json
 import gleam/list
 import gleam/option.{Some}
-import gleam/string
 import wisp.{type Request, type Response}
 
 // We don't HAVE to use an intermediate type on the way to parsing TodoItems
@@ -36,7 +35,6 @@ pub fn todo_items_middleware(
         let result = json.parse(json_string, decode.list(of: todo_item_decoder))
         case result {
           Ok(todo_items) -> {
-            io.println(string.inspect(todo_items))
             todo_items
           }
           Error(_) -> {
