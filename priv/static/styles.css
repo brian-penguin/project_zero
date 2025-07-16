@@ -83,8 +83,9 @@ h6 {
   --gray-bg: rgba(0, 0, 0, 0.06);
   --main-bg-color: #FDDB29;
   --text: #000;
+  --alt-bg-color: #000;
+  --alt-text: rgba(255, 255, 255, 1);
 }
-
 
 html {
   -moz-text-size-adjust: none;
@@ -94,39 +95,58 @@ html {
 }
 
 #app {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
   box-sizing: border-box;
   font-size: 40px;
   background-color: var(--main-bg-color);
 }
 
-.title {
+.page-title-container {
+  width: 100%;
+  height: max-content;
+  text-align: center;
+  margin: 0.5em;
+}
+
+.page-title {
   font-weight: 800;
   font-style: normal;
-  font-size: 60px;
+  font-size: 100px;
 }
 
 .font-gothic {
   font-family: "bu Gothic Hybrid";
 }
 
-.add-todo-item-input__input {
-  width: auto;
+.add-todo-item-input {
+  width: 66%;
+  margin: auto;
+  margin-bottom: 1em;
 }
 
-.todo-item__inner {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: right;
+.add-todo-item-input__input {
+  width: 100%;
 }
-.todo-item__inner:first-child {
+
+.todo-items {
+  width: 50%;
+  margin: auto;
+  text-align: center;
+}
+
+.todo-item {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  border-bottom: 1px;
+}
+
+.todo-item__title {
   margin-right: auto;
 }
 
-.todo-item__inner button {
+.todo-item button {
   font-size: 0.5em;
   margin: 2px;
+  background-color: var(--alt-bg-color);
+  color: var(--alt-text);
 }

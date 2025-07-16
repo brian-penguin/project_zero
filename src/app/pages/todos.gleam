@@ -6,31 +6,36 @@ import lustre/element/html.{button, div, form, h1, input, span, svg}
 import lustre/element/svg
 
 pub fn root(todo_items: List(TodoItem)) -> Element(t) {
-  div([class("todo-items-container")], [
-    h1([class("font-gothic"), class("title")], [text("Todos")]),
+  div([class("todo-items-page"), class("font-gothic")], [
+    div([class("page-title-container")], [
+      h1([class("font-gothic"), class("page-title")], [text("Todos")]),
+    ]),
+    todo_items_input(),
     todo_item_elements(todo_items),
   ])
 }
 
 fn todo_item_elements(todo_items: List(TodoItem)) -> Element(t) {
-  div([class("todo-items"), class("font-gothic")], [
-    todo_items_input(),
+  div([class("todo-items")], [
     div([class("todo-items__inner")], [
-      div(
-        [class("todo-items__list")],
-        todo_items
-          |> list.map(todo_item),
-      ),
+      todo_items_list(todo_items),
       todo_items_empty(),
     ]),
   ])
+}
+
+fn todo_items_list(todo_items: List(TodoItem)) -> Element(t) {
+  div(
+    [],
+    todo_items
+      |> list.map(todo_item),
+  )
 }
 
 fn todo_items_input() -> Element(t) {
   form(
     [
       class("add-todo-item-input"),
-      class("font-gothic"),
       attribute.method("POST"),
       attribute.action("/todo_items"),
     ],
@@ -53,27 +58,25 @@ fn todo_item(todo_item: TodoItem) -> Element(t) {
     }
   }
 
-  div([class("todo-item" <> completed_css_class)], [
-    div([class("todo-item__inner")], [
-      span([class("todo-item__title")], [text(todo_item.title)]),
-      form(
-        [
-          attribute.method("POST"),
-          // TODO BRIAN WTF IS THIS!, do we not like support patch/put natively?
-          attribute.action(
-            "/todo_items/" <> todo_item.id <> "/complete?_method=PATCH",
-          ),
-        ],
-        [button([class("todo-item__button")], [text("complete")])],
-      ),
-      form(
-        [
-          attribute.method("POST"),
-          attribute.action("/todo_items/" <> todo_item.id <> "?_method=DELETE"),
-        ],
-        [button([class("todo__delete")], [text("delete")])],
-      ),
-    ]),
+  div([class("todo-item"), class(completed_css_class)], [
+    span([class("todo-item__title")], [text(todo_item.title)]),
+    form(
+      [
+        attribute.method("POST"),
+        // TODO BRIAN WTF IS THIS!, do we not like support patch/put natively?
+        attribute.action(
+          "/todo_items/" <> todo_item.id <> "/complete?_method=PATCH",
+        ),
+      ],
+      [button([class("todo-item__button")], [text("Complete")])],
+    ),
+    form(
+      [
+        attribute.method("POST"),
+        attribute.action("/todo_items/" <> todo_item.id <> "?_method=DELETE"),
+      ],
+      [button([class("todo-item__delete")], [text("Delete")])],
+    ),
   ])
 }
 
