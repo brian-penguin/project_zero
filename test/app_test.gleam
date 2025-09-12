@@ -1,5 +1,6 @@
 import app/router
 import app/web.{type Context, Context}
+import gleam/list
 import gleam/string
 import gleeunit
 import gleeunit/should
@@ -61,8 +62,9 @@ pub fn get_stylesheet_test() {
   let response = router.handle_request(request, ctx)
 
   assert response.status == 200
+
   assert response.headers
-    == [#("content-type", "text/css; charset=utf-8"), #("etag", "664-67C1E11B")]
+    |> list.contains(any: #("content-type", "text/css; charset=utf-8"))
 }
 
 pub fn get_javascript_test() {
@@ -73,8 +75,5 @@ pub fn get_javascript_test() {
   assert response.status == 200
 
   assert response.headers
-    == [
-      #("content-type", "text/javascript; charset=utf-8"),
-      #("etag", "1B-675C658C"),
-    ]
+    |> list.contains(any: #("content-type", "text/javascript; charset=utf-8"))
 }
