@@ -1,7 +1,6 @@
 import app/models/todo_item.{type TodoItem, create_todo_item}
 import app/web.{type Context, Context}
 import gleam/dynamic/decode
-import gleam/io
 import gleam/json
 import gleam/list
 import gleam/option.{Some}
@@ -24,7 +23,7 @@ pub fn todo_items_middleware(
     // We are just using a cookie for storage right now but we will want to change this later to something else
     case wisp.get_cookie(req, "todo_items", wisp.PlainText) {
       Ok(json_string) -> {
-        io.println("We are in Ok for getting the cookie")
+        wisp.log_debug("We are in Ok for getting the cookie")
         let todo_item_decoder = {
           use id <- decode.field("id", decode.string)
           use title <- decode.field("title", decode.string)
@@ -38,13 +37,13 @@ pub fn todo_items_middleware(
             todo_items
           }
           Error(_) -> {
-            io.println("could not parse the json")
+            wisp.log_debug("could not parse the json")
             []
           }
         }
       }
       Error(_) -> {
-        io.println("we have failed to get the cookie")
+        wisp.log_debug("we have failed to get the cookie")
         []
       }
     }

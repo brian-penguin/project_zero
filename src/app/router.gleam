@@ -2,7 +2,6 @@ import app/models/todo_item
 import app/pages
 import app/pages/layout.{layout}
 import app/routes/todo_item_routes.{todo_items_middleware}
-import gleam/io
 import gleam/json
 import gleam/list
 import gleam/option.{None}
@@ -19,7 +18,7 @@ pub fn handle_request(req: Request, ctx: web.Context) -> Response {
   use req <- web.middleware(req, ctx)
   use ctx <- todo_items_middleware(req, ctx)
 
-  io.println(string.inspect(req))
+  wisp.log_debug(string.inspect(req))
 
   case wisp.path_segments(req) {
     [] -> home_page(req, ctx)
