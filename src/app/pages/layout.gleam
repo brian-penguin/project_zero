@@ -18,6 +18,23 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
         attribute.rel("stylesheet"),
         attribute.href("/static/fonts.css"),
       ]),
+      html.link([
+        attribute.rel("apple-touch-icon"),
+        attribute.sizes("180x180"),
+        attribute.href("/static/apple-touch-icon.png"),
+      ]),
+      html.link([
+        attribute.rel("icon"),
+        attribute.type_("img/png"),
+        attribute.sizes("32x32"),
+        attribute.href("/static/favicon-32x32.png"),
+      ]),
+      html.link([
+        attribute.rel("icon"),
+        attribute.type_("img/png"),
+        attribute.sizes("16x16"),
+        attribute.href("/static/favicon-16x16.png"),
+      ]),
     ]),
     html.body([attribute.id("app")], elements),
   ])
