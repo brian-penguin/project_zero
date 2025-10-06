@@ -1,6 +1,0 @@
-This favicon was generated using the following font:
-
-- Font Title: Manufacturing Consent
-- Font Author: undefined
-- Font Source: https://fonts.gstatic.com/s/manufacturingconsent/v1/N0bL2TVONuFkPkuHfiECSLCwuZS-D-IsakikR6QvbfFYLA.ttf
-- Font License: undefined)
