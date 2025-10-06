@@ -4,7 +4,8 @@ import gleam/string_tree
 import wisp
 
 pub type Context {
-  // TODO BRIAN, is this like how we pass all context around?
+  // This type contains all the "Context" we need to perform a request
+  // in the future it might also contain a database connection pool or cache key
   Context(static_directory: String, todo_items: List(TodoItem))
 }
 

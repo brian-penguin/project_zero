@@ -39,8 +39,6 @@ fn todo_items_page(req: Request, ctx: web.Context) -> Response {
   |> wisp.html_body(html)
 }
 
-// This feels like it doesn't want to exist in the router. Should it exist in the todo_item_routes?
-// Or maybe it should be as a handler?
 fn create_todo_items(req: Request, ctx: web.Context) -> Response {
   use form <- wisp.require_form(req)
   let current_todo_items = ctx.todo_items
@@ -94,7 +92,7 @@ fn delete_todo_item(req: Request, ctx: web.Context, id: String) -> Response {
   )
 }
 
-// Feels like it should be a serializer?
+// TODO Feels like it should be a serializer?
 // Helper item for creating the json to store in our cookie
 fn todo_items_to_json(items: List(todo_item.TodoItem)) -> String {
   "["
