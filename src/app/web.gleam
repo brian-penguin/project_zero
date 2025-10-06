@@ -1,7 +1,7 @@
+import app/models/todo_item.{type TodoItem}
 import gleam/bool
 import gleam/string_tree
 import wisp
-import app/models/todo_item.{type TodoItem}
 
 pub type Context {
   // TODO BRIAN, is this like how we pass all context around?
