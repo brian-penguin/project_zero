@@ -12,7 +12,7 @@ import wisp.{type Request, type Response}
 
 // https://hexdocs.pm/gleam_stdlib/gleam/string_tree.html
 import app/web
-import gleam/http.{Get, Post}
+import gleam/http.{Delete, Get, Patch, Post}
 
 pub fn handle_request(req: Request, ctx: web.Context) -> Response {
   use req <- web.middleware(req, ctx)
@@ -22,7 +22,8 @@ pub fn handle_request(req: Request, ctx: web.Context) -> Response {
 
   case wisp.path_segments(req) {
     [] -> home_page(req, ctx)
-    ["todo_items"] -> todo_items_handler(req, ctx)
+    ["todos", id] -> todo_item_handler(req, ctx, id)
+    ["todos"] -> todo_items_handler(req, ctx)
 
     // Handle Empty Responses -> These are configured by our global middleware
     ["internal-server-error"] -> wisp.internal_server_error()
@@ -46,11 +47,21 @@ fn home_page(req: Request, _ctx: web.Context) -> Response {
   |> wisp.html_body(html)
 }
 
+// So maybe this is like how we do collections?
 fn todo_items_handler(req: Request, ctx: web.Context) -> Response {
   case req.method {
     Get -> todo_items_page(req, ctx)
     Post -> create_todo_items(req, ctx)
-    _ -> wisp.method_not_allowed([Get, Post])
+    _ -> wisp.method_not_allowed(allowed: [Get, Post])
+  }
+}
+
+fn todo_item_handler(req: Request, ctx: web.Context, id: String) -> Response {
+  case req.method {
+    Get -> todo_items_page(req, ctx)
+    Post -> create_todo_items(req, ctx)
+    Delete -> delete_todo_item(req, ctx, id)
+    _ -> wisp.method_not_allowed(allowed: [Get, Post, Delete])
   }
 }
 
@@ -87,7 +98,7 @@ fn create_todo_items(req: Request, ctx: web.Context) -> Response {
 
   case result {
     Ok(todo_items_json) -> {
-      wisp.redirect("/todo_items")
+      wisp.redirect("/todos")
       |> wisp.set_cookie(
         req,
         "todo_items",
@@ -100,6 +111,24 @@ fn create_todo_items(req: Request, ctx: web.Context) -> Response {
       wisp.bad_request()
     }
   }
+}
+
+fn delete_todo_item(req: Request, ctx: web.Context, id: String) -> Response {
+  let current_todo_items = ctx.todo_items
+
+  let todo_items_json = {
+    list.filter(current_todo_items, fn(todo_item) { todo_item.id != id })
+    |> todo_items_to_json
+  }
+
+  wisp.redirect("/todos")
+  |> wisp.set_cookie(
+    req,
+    "todo_items",
+    todo_items_json,
+    wisp.PlainText,
+    60 * 60 * 24,
+  )
 }
 
 // Feels like it should be a serializer?

@@ -2,8 +2,7 @@ import app/models/todo_item.{type TodoItem}
 import gleam/list
 import lustre/attribute.{autofocus, class, name, placeholder}
 import lustre/element.{type Element, text}
-import lustre/element/html.{button, div, form, h1, input, span, svg}
-import lustre/element/svg
+import lustre/element/html.{button, div, form, h1, input, span}
 
 pub fn root(todo_items: List(TodoItem)) -> Element(t) {
   div([class("todo-items-page"), class("font-gothic")], [
@@ -37,7 +36,7 @@ fn todo_items_input() -> Element(t) {
     [
       class("add-todo-item-input"),
       attribute.method("POST"),
-      attribute.action("/todo_items"),
+      attribute.action("/todos"),
     ],
     [
       input([
@@ -62,10 +61,12 @@ fn todo_item(todo_item: TodoItem) -> Element(t) {
     span([class("todo-item__title")], [text(todo_item.title)]),
     form(
       [
+        // NOTE: We do this because there's not a "native" patch or delete.
+        // - Forms are almost always submitted by web-browsers as post requests
+        // - See: https://github.com/gleam-wisp/wisp/blob/main/src/wisp.gleam#L743
         attribute.method("POST"),
-        // TODO BRIAN WTF IS THIS!, do we not like support patch/put natively?
         attribute.action(
-          "/todo_items/" <> todo_item.id <> "/complete?_method=PATCH",
+          "/todos/" <> todo_item.id <> "/completion?_method=PATCH",
         ),
       ],
       [button([class("todo-item__button")], [text("Complete")])],
@@ -73,7 +74,7 @@ fn todo_item(todo_item: TodoItem) -> Element(t) {
     form(
       [
         attribute.method("POST"),
-        attribute.action("/todo_items/" <> todo_item.id <> "?_method=DELETE"),
+        attribute.action("/todos/" <> todo_item.id <> "?_method=DELETE"),
       ],
       [button([class("todo-item__delete")], [text("Delete")])],
     ),
@@ -82,35 +83,4 @@ fn todo_item(todo_item: TodoItem) -> Element(t) {
 
 fn todo_items_empty() -> Element(t) {
   div([class("todo-items__empty")], [])
-}
-
-// TODO: these don't look right. Leaving out for now
-fn svg_icon_checked() -> Element(t) {
-  svg(
-    [class("todo__checked-icon"), attribute.attribute("viewBox", "0 0 24 24")],
-    [
-      svg.path([
-        attribute.attribute("fill", "currentColor"),
-        attribute.attribute(
-          "d",
-          "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z",
-        ),
-      ]),
-    ],
-  )
-}
-
-fn svg_icon_delete() -> Element(t) {
-  svg(
-    [class("todo__delete-icon"), attribute.attribute("viewBox", "0 0 24 24")],
-    [
-      svg.path([
-        attribute.attribute("fill", "currentColor"),
-        attribute.attribute(
-          "d",
-          "M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M9,8H11V17H9V8M13,8H15V17H13V8Z",
-        ),
-      ]),
-    ],
-  )
 }
