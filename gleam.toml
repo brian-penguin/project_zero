@@ -27,3 +27,4 @@ gleam_otp = ">= 1.2.0 and < 2.0.0"
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
 olive = { git = "git@github.com:brian-penguin/olive.git", ref = "main" }
+cigogne = ">= 5.0.3 and < 6.0.0"
