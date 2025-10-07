@@ -34,7 +34,7 @@ fn todo_items_page(req: Request, ctx: web.Context) -> Response {
   let html =
     [pages.todos(ctx.todo_items)]
     |> layout
-    |> element.to_document_string_tree
+    |> element.to_document_string
   wisp.ok()
   |> wisp.html_body(html)
 }
@@ -69,7 +69,7 @@ fn create_todo_items(req: Request, ctx: web.Context) -> Response {
       )
     }
     Error(_) -> {
-      wisp.bad_request()
+      wisp.bad_request("Invalid JSON")
     }
   }
 }
