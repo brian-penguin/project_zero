@@ -1,5 +1,6 @@
 import app/router
 import app/web.{type Context, Context}
+import gleam/erlang/process
 import gleam/http
 import gleam/list
 import gleam/string
@@ -15,8 +16,13 @@ pub fn main() {
 // TODO: What is this called?
 // - I want to call this currying? partial application? Idk the difference?
 fn with_context(testcase: fn(Context) -> tc) -> tc {
+  let db_process_name = process.new_name("test-db")
   let context =
-    Context(static_directory: project_zero.static_directory(), todo_items: [])
+    Context(
+      static_directory: project_zero.static_directory(),
+      todo_items: [],
+      db_pool_name: db_process_name,
+    )
   testcase(context)
 }
 

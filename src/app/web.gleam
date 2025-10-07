@@ -1,11 +1,17 @@
 import app/models/todo_item.{type TodoItem}
-import gleam/bool
+import app/routes/default_error_routes
+import gleam/erlang/process
+import pog
 import wisp
 
 pub type Context {
   // This type contains all the "Context" we need to perform a request
   // in the future it might also contain a database connection pool or cache key
-  Context(static_directory: String, todo_items: List(TodoItem))
+  Context(
+    static_directory: String,
+    todo_items: List(TodoItem),
+    db_pool_name: process.Name(pog.Message),
+  )
 }
 
 // This is our middleware stack for everything that goes through our "web" request_handler function
@@ -41,34 +47,8 @@ pub fn middleware(
   use req <- wisp.csrf_known_header_protection(req)
 
   // See below, we want to use the
-  use <- default_responses
+  use <- default_error_routes.default_error_responses
 
   // Handle the request!
   handle_request(req)
-}
-
-pub fn default_responses(handle_request: fn() -> wisp.Response) -> wisp.Response {
-  let response = handle_request()
-
-  use <- bool.guard(when: response.body != wisp.Text(""), return: response)
-
-  case response.status {
-    404 | 405 ->
-      "<h1>Not Found</h1>"
-      |> wisp.html_body(response, _)
-
-    400 | 422 ->
-      "<h1>Bad request</h1>"
-      |> wisp.html_body(response, _)
-
-    413 ->
-      "<h1>Request entity too large</h1>"
-      |> wisp.html_body(response, _)
-
-    500 ->
-      "<h1>Internal server error</h1>"
-      |> wisp.html_body(response, _)
-
-    _ -> response
-  }
 }

@@ -21,6 +21,8 @@ gleam_stdlib = ">= 0.44.0 and < 2.0.0"
 lustre = ">= 5.0.0 and < 6.0.0"
 mist = ">= 4.0.0 and < 6.0.0"
 wisp = ">= 2.0.0 and < 3.0.0"
+pog = ">= 4.1.0 and < 5.0.0"
+gleam_otp = ">= 1.2.0 and < 2.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
