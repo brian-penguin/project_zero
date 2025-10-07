@@ -23,10 +23,10 @@ pub fn handle_request(req: Request, ctx: web.Context) -> Response {
 
     // Handle Empty Responses -> These are configured by our global middleware
     ["internal-server-error"] -> wisp.internal_server_error()
-    ["unprocessable-entity"] -> wisp.unprocessable_entity()
+    ["unprocessable-entity"] -> wisp.unprocessable_content()
     ["method-not-allowed"] -> wisp.method_not_allowed([])
-    ["entity-too-large"] -> wisp.entity_too_large()
-    ["bad-request"] -> wisp.bad_request()
+    ["entity-too-large"] -> wisp.content_too_large()
+    ["bad-request"] -> wisp.bad_request("Request was not good")
     _ -> wisp.not_found()
   }
 }
@@ -37,7 +37,7 @@ fn home_page(req: Request, _ctx: web.Context) -> Response {
   let html =
     [pages.home()]
     |> layout
-    |> element.to_document_string_tree
+    |> element.to_document_string
 
   wisp.ok()
   |> wisp.html_body(html)

@@ -1,6 +1,5 @@
 import app/models/todo_item.{type TodoItem}
 import gleam/bool
-import gleam/string_tree
 import wisp
 
 pub type Context {
@@ -38,6 +37,9 @@ pub fn middleware(
   // Rewrite HEAD requests to GET requests and return an empty body.
   use req <- wisp.handle_head(req)
 
+  // Add CSRF check
+  use req <- wisp.csrf_known_header_protection(req)
+
   // See below, we want to use the
   use <- default_responses
 
@@ -48,27 +50,23 @@ pub fn middleware(
 pub fn default_responses(handle_request: fn() -> wisp.Response) -> wisp.Response {
   let response = handle_request()
 
-  use <- bool.guard(when: response.body != wisp.Empty, return: response)
+  use <- bool.guard(when: response.body != wisp.Text(""), return: response)
 
   case response.status {
     404 | 405 ->
       "<h1>Not Found</h1>"
-      |> string_tree.from_string
       |> wisp.html_body(response, _)
 
     400 | 422 ->
       "<h1>Bad request</h1>"
-      |> string_tree.from_string
       |> wisp.html_body(response, _)
 
     413 ->
       "<h1>Request entity too large</h1>"
-      |> string_tree.from_string
       |> wisp.html_body(response, _)
 
     500 ->
       "<h1>Internal server error</h1>"
-      |> string_tree.from_string
       |> wisp.html_body(response, _)
 
     _ -> response

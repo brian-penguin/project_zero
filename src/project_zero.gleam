@@ -34,7 +34,7 @@ pub fn main() {
     |> mist.new
     |> mist.port(8000)
     // TODO -> Configurable with ENV
-    |> mist.start_http
+    |> mist.start
 
   // NOTE: mist will start a new erlang process, so we need to sleep this one while it works concurrently
   process.sleep_forever()
