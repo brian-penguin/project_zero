@@ -1,6 +1,7 @@
 import app/models/todo_item
 import app/pages
 import app/pages/layout.{layout}
+import app/sql
 import app/web
 import gleam/http.{Delete, Get, Post}
 import gleam/json
@@ -9,7 +10,9 @@ import gleam/option.{None}
 import gleam/result
 import gleam/string
 import lustre/element
+import pog
 import wisp.{type Request, type Response}
+import youid/uuid
 
 pub fn todo_items_handler(req: Request, ctx: web.Context) -> Response {
   case req.method {
@@ -32,7 +35,7 @@ fn todo_items_page(req: Request, ctx: web.Context) -> Response {
   use <- wisp.require_method(req, Get)
 
   let html =
-    [pages.todos(ctx.todo_items)]
+    [pages.todos(fetch_todo_items(ctx))]
     |> layout
     |> element.to_document_string
   wisp.ok()
@@ -109,4 +112,20 @@ fn todo_item_to_json(item: todo_item.TodoItem) -> String {
     #("completed", json.bool(todo_item.todo_item_status_to_bool(item.status))),
   ])
   |> json.to_string
+}
+
+fn fetch_todo_items(ctx: web.Context) -> List(todo_item.TodoItem) {
+  let db = pog.named_connection(ctx.db_pool_name)
+
+  let assert Ok(pog.Returned(_rows_count, rows)) = sql.fetch_todos(db)
+  list.map(rows, fn(row) {
+    // TODO -> I want to keep the timestamps for the purposes of knowing "when was this completed"
+    // But it definitely will need a little finessing
+
+    // TODO timestampstz is not supported and was causing this to blow up.
+    //- We can strip the tz stuff but I'm not sure how we want to handle it, maybe always coerce to iso8601?
+    let id_str = uuid.to_string(row.id)
+
+    todo_item.create_todo_item(option.Some(id_str), row.title, False)
+  })
 }
