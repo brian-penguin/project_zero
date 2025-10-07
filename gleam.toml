@@ -24,4 +24,4 @@ gleam_json = ">= 3.0.0 and < 4.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
-# olive = ">= 2.0.0 and < 3.0.0"
+olive = { git = "git@github.com:brian-penguin/olive.git", ref = "main" }
