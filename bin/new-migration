@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+gleam run -m cigogne new --name $1
