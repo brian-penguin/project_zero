@@ -8,6 +8,26 @@ import gleam/dynamic/decode
 import pog
 import youid/uuid.{type Uuid}
 
+/// Runs the `create_todo` query
+/// defined in `./src/app/sql/create_todo.sql`.
+///
+/// > 🐿️ This function was generated automatically using v4.4.2 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn create_todo(
+  db: pog.Connection,
+  arg_1: String,
+) -> Result(pog.Returned(Nil), pog.QueryError) {
+  let decoder = decode.map(decode.dynamic, fn(_) { Nil })
+
+  "INSERT INTO todo_items (title) VALUES ($1)
+"
+  |> pog.query
+  |> pog.parameter(pog.text(arg_1))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
 /// A row you get from running the `fetch_todos` query
 /// defined in `./src/app/sql/fetch_todos.sql`.
 ///

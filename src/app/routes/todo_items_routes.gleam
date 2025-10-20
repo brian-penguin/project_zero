@@ -6,7 +6,7 @@ import app/web
 import gleam/http.{Delete, Get, Post}
 import gleam/json
 import gleam/list
-import gleam/option.{None}
+import gleam/option
 import gleam/result
 import gleam/string
 import lustre/element
@@ -44,35 +44,23 @@ fn todo_items_page(req: Request, ctx: web.Context) -> Response {
 
 fn create_todo_items(req: Request, ctx: web.Context) -> Response {
   use form <- wisp.require_form(req)
-  let current_todo_items = ctx.todo_items
+  let db = pog.named_connection(ctx.db_pool_name)
 
   let result = {
     use todo_item_title <- result.try(list.key_find(
       form.values,
       "todo_item_title",
     ))
-    let new_todo_item = todo_item.create_todo_item(None, todo_item_title, False)
 
-    let new_todo_items =
-      list.append(current_todo_items, [new_todo_item])
-      |> todo_items_to_json
-
-    Ok(new_todo_items)
+    Ok(sql.create_todo(db, todo_item_title))
   }
 
   case result {
-    Ok(todo_items_json) -> {
+    Ok(_) -> {
       wisp.redirect("/todos")
-      |> wisp.set_cookie(
-        req,
-        "todo_items",
-        todo_items_json,
-        wisp.PlainText,
-        60 * 60 * 24,
-      )
     }
     Error(_) -> {
-      wisp.bad_request("Invalid JSON")
+      wisp.bad_request("Invalid")
     }
   }
 }
