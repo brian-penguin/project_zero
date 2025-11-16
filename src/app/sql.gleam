@@ -50,6 +50,26 @@ pub fn create_todo(
   |> pog.execute(db)
 }
 
+/// Runs the `delete_todo` query
+/// defined in `./src/app/sql/delete_todo.sql`.
+///
+/// > 🐿️ This function was generated automatically using v4.4.2 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn delete_todo(
+  db: pog.Connection,
+  arg_1: Uuid,
+) -> Result(pog.Returned(Nil), pog.QueryError) {
+  let decoder = decode.map(decode.dynamic, fn(_) { Nil })
+
+  "DELETE FROM todo_items WHERE id=($1)
+"
+  |> pog.query
+  |> pog.parameter(pog.text(uuid.to_string(arg_1)))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
 /// A row you get from running the `fetch_todos` query
 /// defined in `./src/app/sql/fetch_todos.sql`.
 ///
