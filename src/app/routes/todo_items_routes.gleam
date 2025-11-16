@@ -4,11 +4,9 @@ import app/pages/layout.{layout}
 import app/sql
 import app/web
 import gleam/http.{Delete, Get, Post}
-import gleam/json
 import gleam/list
 import gleam/option
 import gleam/result
-import gleam/string
 import lustre/element
 import pog
 import wisp.{type Request, type Response}
@@ -95,41 +93,18 @@ fn create_todo_item_completion(
   }
 }
 
-fn delete_todo_item(req: Request, ctx: web.Context, id: String) -> Response {
-  let current_todo_items = ctx.todo_items
+fn delete_todo_item(_req: Request, ctx: web.Context, id: String) -> Response {
+  let db = pog.named_connection(ctx.db_pool_name)
 
-  let todo_items_json = {
-    list.filter(current_todo_items, fn(todo_item) { todo_item.id != id })
-    |> todo_items_to_json
+  case uuid.from_string(id) {
+    Ok(valid_id) -> {
+      let _res = sql.delete_todo(db, valid_id)
+      wisp.redirect("/todos")
+    }
+    Error(_) -> {
+      wisp.bad_request("Invalid")
+    }
   }
-
-  wisp.redirect("/todos")
-  |> wisp.set_cookie(
-    req,
-    "todo_items",
-    todo_items_json,
-    wisp.PlainText,
-    60 * 60 * 24,
-  )
-}
-
-// TODO Feels like it should be a serializer?
-// Helper item for creating the json to store in our cookie
-fn todo_items_to_json(items: List(todo_item.TodoItem)) -> String {
-  "["
-  <> items
-  |> list.map(todo_item_to_json)
-  |> string.join(",")
-  <> "]"
-}
-
-fn todo_item_to_json(item: todo_item.TodoItem) -> String {
-  json.object([
-    #("id", json.string(item.id)),
-    #("title", json.string(item.title)),
-    #("completed", json.bool(todo_item.todo_item_status_to_bool(item.status))),
-  ])
-  |> json.to_string
 }
 
 fn fetch_todo_items(ctx: web.Context) -> List(todo_item.TodoItem) {
