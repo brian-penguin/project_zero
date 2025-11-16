@@ -5,6 +5,8 @@
 ////
 
 import gleam/dynamic/decode
+import gleam/option.{type Option}
+import gleam/time/timestamp.{type Timestamp}
 import pog
 import youid/uuid.{type Uuid}
 
@@ -55,7 +57,7 @@ pub fn create_todo(
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type FetchTodosRow {
-  FetchTodosRow(id: Uuid, title: String)
+  FetchTodosRow(id: Uuid, title: String, completed_at: Option(Timestamp))
 }
 
 /// Runs the `fetch_todos` query
@@ -70,12 +72,17 @@ pub fn fetch_todos(
   let decoder = {
     use id <- decode.field(0, uuid_decoder())
     use title <- decode.field(1, decode.string)
-    decode.success(FetchTodosRow(id:, title:))
+    use completed_at <- decode.field(
+      2,
+      decode.optional(pog.timestamp_decoder()),
+    )
+    decode.success(FetchTodosRow(id:, title:, completed_at:))
   }
 
   "SELECT
     id,
-    title
+    title,
+    completed_at
 FROM
     todo_items
 ORDER BY

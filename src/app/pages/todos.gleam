@@ -66,7 +66,7 @@ fn todo_item(todo_item: TodoItem) -> Element(t) {
         // - See: https://github.com/gleam-wisp/wisp/blob/main/src/wisp.gleam#L743
         attribute.method("POST"),
         attribute.action(
-          "/todos/" <> todo_item.id <> "/completion?_method=PATCH",
+          "/todos/" <> todo_item.id <> "/completion",
         ),
       ],
       [button([class("todo-item__button")], [text("Complete")])],

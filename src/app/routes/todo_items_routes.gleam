@@ -23,11 +23,23 @@ pub fn todo_items_handler(req: Request, ctx: web.Context) -> Response {
 }
 
 pub fn todo_item_handler(req: Request, ctx: web.Context, id: String) -> Response {
+  // - I think I want to have a put/patch in here somewhere which might mean overriding the form's _method
   case req.method {
     Get -> todo_items_page(req, ctx)
     Post -> create_todo_items(req, ctx)
     Delete -> delete_todo_item(req, ctx, id)
     _ -> wisp.method_not_allowed(allowed: [Get, Post, Delete])
+  }
+}
+
+pub fn todo_item_completion_handler(
+  req: Request,
+  ctx: web.Context,
+  id: String,
+) -> Response {
+  case req.method {
+    Post -> create_todo_item_completion(req, ctx, id)
+    _ -> wisp.method_not_allowed(allowed: [Post, Delete])
   }
 }
 
@@ -57,6 +69,24 @@ fn create_todo_items(req: Request, ctx: web.Context) -> Response {
 
   case result {
     Ok(_) -> {
+      wisp.redirect("/todos")
+    }
+    Error(_) -> {
+      wisp.bad_request("Invalid")
+    }
+  }
+}
+
+fn create_todo_item_completion(
+  _req: Request,
+  ctx: web.Context,
+  id: String,
+) -> Response {
+  let db = pog.named_connection(ctx.db_pool_name)
+
+  case uuid.from_string(id) {
+    Ok(valid_id) -> {
+      let _res = sql.complete_todo(db, valid_id)
       wisp.redirect("/todos")
     }
     Error(_) -> {
@@ -107,13 +137,8 @@ fn fetch_todo_items(ctx: web.Context) -> List(todo_item.TodoItem) {
 
   let assert Ok(pog.Returned(_rows_count, rows)) = sql.fetch_todos(db)
   list.map(rows, fn(row) {
-    // TODO -> I want to keep the timestamps for the purposes of knowing "when was this completed"
-    // But it definitely will need a little finessing
-
-    // TODO timestampstz is not supported and was causing this to blow up.
-    //- We can strip the tz stuff but I'm not sure how we want to handle it, maybe always coerce to iso8601?
     let id_str = uuid.to_string(row.id)
 
-    todo_item.create_todo_item(option.Some(id_str), row.title, False)
+    todo_item.create_todo_item(option.Some(id_str), row.title, row.completed_at)
   })
 }

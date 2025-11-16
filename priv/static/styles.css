@@ -144,6 +144,11 @@ html {
   margin-right: auto;
 }
 
+.todo-item__complete {
+  text-decoration: line-through;
+  text-decoration-style: double;
+}
+
 .todo-item button {
   font-size: 0.5em;
   margin: 2px;

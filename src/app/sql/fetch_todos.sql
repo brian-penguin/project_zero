@@ -1,6 +1,7 @@
 SELECT
     id,
-    title
+    title,
+    completed_at
 FROM
     todo_items
 ORDER BY
