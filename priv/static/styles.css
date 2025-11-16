@@ -80,7 +80,7 @@ h6 {
   --radius: calc(var(--cap-height) / 3);
   --gray-text: rgba(0, 0, 0, 0.4);
   --gray-line: rgba(0, 0, 0, 0.2);
-  --gray-bg: rgba(0, 0, 0, 0.06);
+  --gray-bg: rgba(0, 0, 0, 0.1);
   --main-bg-color: #FDDB29;
   --text: #000;
   --alt-bg-color: #000;
@@ -153,5 +153,10 @@ html {
   font-size: 0.5em;
   margin: 2px;
   background-color: var(--alt-bg-color);
+  color: var(--alt-text);
+}
+
+.todo-item button:disabled {
+  background-color: var(--gray-bg);
   color: var(--alt-text);
 }

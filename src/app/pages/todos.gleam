@@ -65,11 +65,9 @@ fn todo_item(todo_item: TodoItem) -> Element(t) {
         // - Forms are almost always submitted by web-browsers as post requests
         // - See: https://github.com/gleam-wisp/wisp/blob/main/src/wisp.gleam#L743
         attribute.method("POST"),
-        attribute.action(
-          "/todos/" <> todo_item.id <> "/completion",
-        ),
+        attribute.action("/todos/" <> todo_item.id <> "/completion"),
       ],
-      [button([class("todo-item__button")], [text("Complete")])],
+      todo_item_complete_button(todo_item),
     ),
     form(
       [
@@ -78,6 +76,25 @@ fn todo_item(todo_item: TodoItem) -> Element(t) {
       ],
       [button([class("todo-item__delete")], [text("Delete")])],
     ),
+  ])
+}
+
+fn todo_item_complete_button(todo_item: TodoItem) -> List(Element(t)) {
+  case todo_item.status {
+    todo_item.Complete -> [completed_todo_item_button()]
+    todo_item.Incomplete -> [incomplete_todo_item_button()]
+  }
+}
+
+fn completed_todo_item_button() -> Element(t) {
+  button([class("todo-item__button"), attribute.disabled(True)], [
+    text("Completed"),
+  ])
+}
+
+fn incomplete_todo_item_button() -> Element(t) {
+  button([class("todo-item__button"), attribute.disabled(False)], [
+    text("Complete!"),
   ])
 }
 
