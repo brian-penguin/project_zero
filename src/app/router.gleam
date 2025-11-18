@@ -1,7 +1,8 @@
 import app/pages
 import app/pages/layout.{layout}
-import app/routes/todo_item_middleware.{todo_items_middleware}
-import app/routes/todo_items_routes.{todo_item_handler, todo_items_handler}
+import app/routes/todo_items_routes.{
+  todo_item_completion_handler, todo_item_handler, todo_items_handler,
+}
 import gleam/string
 import lustre/element
 import wisp.{type Request, type Response}
@@ -12,12 +13,12 @@ import gleam/http.{Get}
 
 pub fn handle_request(req: Request, ctx: web.Context) -> Response {
   use req <- web.middleware(req, ctx)
-  use ctx <- todo_items_middleware(req, ctx)
 
   wisp.log_debug(string.inspect(req))
 
   case wisp.path_segments(req) {
     [] -> home_page(req, ctx)
+    ["todos", id, "completion"] -> todo_item_completion_handler(req, ctx, id)
     ["todos", id] -> todo_item_handler(req, ctx, id)
     ["todos"] -> todo_items_handler(req, ctx)
 

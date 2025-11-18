@@ -1,5 +1,6 @@
-import gleam/option.{type Option}
+import gleam/option.{type Option, Some, None}
 import wisp
+import gleam/time/timestamp
 
 pub type TodoItemStatus {
   Complete
@@ -13,13 +14,13 @@ pub type TodoItem {
 pub fn create_todo_item(
   id: Option(String),
   title: String,
-  completed: Bool,
+  completed_at: Option(timestamp.Timestamp),
 ) -> TodoItem {
   let id = option.unwrap(id, wisp.random_string(64))
 
-  case completed {
-    True -> TodoItem(id, title, Complete)
-    False -> TodoItem(id, title, Incomplete)
+  case completed_at {
+    Some(_) -> TodoItem(id, title, Complete)
+    None() -> TodoItem(id, title, Incomplete)
   }
 }
 

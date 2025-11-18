@@ -1,15 +1,16 @@
 import app/models/todo_item
 import app/pages
 import app/pages/layout.{layout}
+import app/sql
 import app/web
 import gleam/http.{Delete, Get, Post}
-import gleam/json
 import gleam/list
-import gleam/option.{None}
+import gleam/option
 import gleam/result
-import gleam/string
 import lustre/element
+import pog
 import wisp.{type Request, type Response}
+import youid/uuid
 
 pub fn todo_items_handler(req: Request, ctx: web.Context) -> Response {
   case req.method {
@@ -20,6 +21,7 @@ pub fn todo_items_handler(req: Request, ctx: web.Context) -> Response {
 }
 
 pub fn todo_item_handler(req: Request, ctx: web.Context, id: String) -> Response {
+  // - I think I want to have a put/patch in here somewhere which might mean overriding the form's _method
   case req.method {
     Get -> todo_items_page(req, ctx)
     Post -> create_todo_items(req, ctx)
@@ -28,11 +30,22 @@ pub fn todo_item_handler(req: Request, ctx: web.Context, id: String) -> Response
   }
 }
 
+pub fn todo_item_completion_handler(
+  req: Request,
+  ctx: web.Context,
+  id: String,
+) -> Response {
+  case req.method {
+    Post -> create_todo_item_completion(req, ctx, id)
+    _ -> wisp.method_not_allowed(allowed: [Post, Delete])
+  }
+}
+
 fn todo_items_page(req: Request, ctx: web.Context) -> Response {
   use <- wisp.require_method(req, Get)
 
   let html =
-    [pages.todos(ctx.todo_items)]
+    [pages.todos(fetch_todo_items(ctx))]
     |> layout
     |> element.to_document_string
   wisp.ok()
@@ -41,72 +54,66 @@ fn todo_items_page(req: Request, ctx: web.Context) -> Response {
 
 fn create_todo_items(req: Request, ctx: web.Context) -> Response {
   use form <- wisp.require_form(req)
-  let current_todo_items = ctx.todo_items
+  let db = pog.named_connection(ctx.db_pool_name)
 
   let result = {
     use todo_item_title <- result.try(list.key_find(
       form.values,
       "todo_item_title",
     ))
-    let new_todo_item = todo_item.create_todo_item(None, todo_item_title, False)
 
-    let new_todo_items =
-      list.append(current_todo_items, [new_todo_item])
-      |> todo_items_to_json
-
-    Ok(new_todo_items)
+    Ok(sql.create_todo(db, todo_item_title))
   }
 
   case result {
-    Ok(todo_items_json) -> {
+    Ok(_) -> {
       wisp.redirect("/todos")
-      |> wisp.set_cookie(
-        req,
-        "todo_items",
-        todo_items_json,
-        wisp.PlainText,
-        60 * 60 * 24,
-      )
     }
     Error(_) -> {
-      wisp.bad_request("Invalid JSON")
+      wisp.bad_request("Invalid")
     }
   }
 }
 
-fn delete_todo_item(req: Request, ctx: web.Context, id: String) -> Response {
-  let current_todo_items = ctx.todo_items
+fn create_todo_item_completion(
+  _req: Request,
+  ctx: web.Context,
+  id: String,
+) -> Response {
+  let db = pog.named_connection(ctx.db_pool_name)
 
-  let todo_items_json = {
-    list.filter(current_todo_items, fn(todo_item) { todo_item.id != id })
-    |> todo_items_to_json
+  case uuid.from_string(id) {
+    Ok(valid_id) -> {
+      let _res = sql.complete_todo(db, valid_id)
+      wisp.redirect("/todos")
+    }
+    Error(_) -> {
+      wisp.bad_request("Invalid")
+    }
   }
-
-  wisp.redirect("/todos")
-  |> wisp.set_cookie(
-    req,
-    "todo_items",
-    todo_items_json,
-    wisp.PlainText,
-    60 * 60 * 24,
-  )
 }
 
-// TODO Feels like it should be a serializer?
-// Helper item for creating the json to store in our cookie
-fn todo_items_to_json(items: List(todo_item.TodoItem)) -> String {
-  "["
-  <> items
-  |> list.map(todo_item_to_json)
-  |> string.join(",")
-  <> "]"
+fn delete_todo_item(_req: Request, ctx: web.Context, id: String) -> Response {
+  let db = pog.named_connection(ctx.db_pool_name)
+
+  case uuid.from_string(id) {
+    Ok(valid_id) -> {
+      let _res = sql.delete_todo(db, valid_id)
+      wisp.redirect("/todos")
+    }
+    Error(_) -> {
+      wisp.bad_request("Invalid")
+    }
+  }
 }
 
-fn todo_item_to_json(item: todo_item.TodoItem) -> String {
-  json.object([
-    #("id", json.string(item.id)),
-    #("title", json.string(item.title)),
-    #("completed", json.bool(todo_item.todo_item_status_to_bool(item.status))),
-  ])
-  |> json.to_string
+fn fetch_todo_items(ctx: web.Context) -> List(todo_item.TodoItem) {
+  let db = pog.named_connection(ctx.db_pool_name)
+
+  let assert Ok(pog.Returned(_rows_count, rows)) = sql.fetch_todos(db)
+  list.map(rows, fn(row) {
+    let id_str = uuid.to_string(row.id)
+
+    todo_item.create_todo_item(option.Some(id_str), row.title, row.completed_at)
+  })
 }
