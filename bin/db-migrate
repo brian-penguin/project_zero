@@ -1,2 +1,4 @@
 #!/usr/bin/env bash
-gleam run -m cigogne up
+
+#Use `up` instead of `all` to migrate just one migration at a time
+gleam run -m cigogne all
