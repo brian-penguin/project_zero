@@ -18,8 +18,6 @@ import wisp/wisp_mist
 // This is the adapter for using wisp with mist
 
 pub fn main() {
-  wisp.configure_logger()
-
   dot_env.new()
   |> dot_env.set_path(".env")
   |> dot_env.set_debug(False)
@@ -34,6 +32,7 @@ pub fn main() {
     Context(
       static_directory: static_directory(),
       todo_items: [],
+      // TODO  BRIAN QUESTION: should just pass the pool connection or the pool name, is there a cost difference?
       db_pool_name: process_name,
     )
   // Partially apply the router.handle_request fn with our ctx
@@ -62,6 +61,7 @@ pub fn static_directory() -> String {
 pub fn start_db_pool_application_supervisor(
   pool_name: process.Name(pog.Message),
 ) {
+  // TODO -> Configurable with ENV
   let pool_child =
     pog.default_config(pool_name)
     |> pog.host("127.0.0.1")
