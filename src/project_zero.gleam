@@ -26,7 +26,10 @@ pub fn main() {
   let assert Ok(secret_key_base) = env.get_string("SECRET_KEY_BASE")
   let process_name = process.new_name("scooter")
 
-  let _result = start_db_pool_application_supervisor(process_name)
+  let assert Ok(_) = start_db_pool_application_supervisor(process_name)
+
+  let db = pog.named_connection(process_name)
+  let assert Ok(_) = pog.query("SELECT 1") |> pog.execute(db)
 
   let ctx =
     Context(
@@ -61,7 +64,7 @@ pub fn static_directory() -> String {
 pub fn start_db_pool_application_supervisor(
   pool_name: process.Name(pog.Message),
 ) {
-  // TODO -> Configurable with ENV
+  // TODO -> Make configurable with ENV
   let pool_child =
     pog.default_config(pool_name)
     |> pog.host("127.0.0.1")

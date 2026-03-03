@@ -1,7 +1,9 @@
 import gleam/bool
 import wisp
 
-pub fn default_error_responses(handle_request: fn() -> wisp.Response) -> wisp.Response {
+pub fn default_error_responses(
+  handle_request: fn() -> wisp.Response,
+) -> wisp.Response {
   let response = handle_request()
 
   use <- bool.guard(when: response.body != wisp.Text(""), return: response)

@@ -22,6 +22,7 @@ pub fn handle_request(req: Request, ctx: web.Context) -> Response {
     ["todos", id] -> todo_item_handler(req, ctx, id)
     ["todos"] -> todo_items_handler(req, ctx)
 
+    // TODO: I'm not sure these work like I think they should.
     // Handle Empty Responses -> These are configured by our global middleware
     ["internal-server-error"] -> wisp.internal_server_error()
     ["unprocessable-entity"] -> wisp.unprocessable_content()

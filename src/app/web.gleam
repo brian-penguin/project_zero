@@ -46,7 +46,6 @@ pub fn middleware(
   // Add CSRF check
   use req <- wisp.csrf_known_header_protection(req)
 
-  // See below, we want to use the
   use <- default_error_routes.default_error_responses
 
   // Handle the request!
