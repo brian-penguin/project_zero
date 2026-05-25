@@ -3,7 +3,7 @@
 // functionality and wrap our requests with it
 
 import app/router
-import app/web.{Context}
+import app/context.{Context}
 import envoy
 import gleam/erlang/process
 import gleam/int
@@ -18,17 +18,12 @@ pub fn start(wrap_reload) {
   wisp.configure_logger()
 
   let assert Ok(secret_key_base) = envoy.get("SECRET_KEY_BASE")
-  let assert Ok(process_name_str) = envoy.get("DATABASE_PROCESS_NAME")
-  let db_process_name = process.new_name(process_name_str)
-
-  let db_pool_child = configure_db_pool_child(db_process_name)
+  let db_pool_name = process.new_name("database")
+  let db_pool_child = configure_db_pool_child(db_pool_name)
   let assert Ok(_) = start_application_supervisor(db_pool_child)
 
   let ctx =
-    Context(
-      static_directory: static_directory(),
-      db: pog.named_connection(db_process_name),
-    )
+    Context(static_directory: static_directory(), db_pool_name: db_pool_name)
 
   let port_str = result.unwrap(envoy.get("PORT"), "8000")
   let assert Ok(port) = int.parse(port_str)

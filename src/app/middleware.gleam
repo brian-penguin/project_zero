@@ -1,18 +1,11 @@
-import pog
-import wisp
-
-pub type Context {
-  Context(
-    static_directory: String,
-    db: pog.Connection,
-  )
-}
-
 // This is our middleware stack for everything that goes through our "web"
 // request_handler function
 // Middleware wrap each other, so the request travels through the stack from
 // top to bottom until it reaches the request handler, at which point the
 // response travels back up through the stack.
+import wisp
+import app/context.{type Context}
+
 pub fn middleware(
   req: wisp.Request,
   ctx: Context,

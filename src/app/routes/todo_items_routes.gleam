@@ -1,8 +1,8 @@
+import app/context.{type Context, db_conn}
 import app/models/todo_item
 import app/pages
 import app/pages/layout.{layout}
 import app/sql
-import app/web
 import gleam/http.{Delete, Get, Post}
 import gleam/list
 import gleam/option
@@ -12,7 +12,7 @@ import pog
 import wisp.{type Request, type Response}
 import youid/uuid
 
-pub fn todo_items_handler(req: Request, ctx: web.Context) -> Response {
+pub fn todo_items_handler(req: Request, ctx: Context) -> Response {
   case req.method {
     Get -> todo_items_page(req, ctx)
     Post -> create_todo_items(req, ctx)
@@ -20,7 +20,11 @@ pub fn todo_items_handler(req: Request, ctx: web.Context) -> Response {
   }
 }
 
-pub fn todo_item_handler(req: Request, ctx: web.Context, id: String) -> Response {
+pub fn todo_item_handler(
+  req: Request,
+  ctx: Context,
+  id: String,
+) -> Response {
   // TODO I think I want to have a put/patch in here somewhere which might mean overriding the form's _method
   // - this should work with our current middleware no problem
   case req.method {
@@ -33,7 +37,7 @@ pub fn todo_item_handler(req: Request, ctx: web.Context, id: String) -> Response
 
 pub fn todo_item_completion_handler(
   req: Request,
-  ctx: web.Context,
+  ctx: Context,
   id: String,
 ) -> Response {
   case req.method {
@@ -42,7 +46,7 @@ pub fn todo_item_completion_handler(
   }
 }
 
-fn todo_items_page(req: Request, ctx: web.Context) -> Response {
+fn todo_items_page(req: Request, ctx: Context) -> Response {
   use <- wisp.require_method(req, Get)
 
   let html =
@@ -53,7 +57,7 @@ fn todo_items_page(req: Request, ctx: web.Context) -> Response {
   |> wisp.html_body(html)
 }
 
-fn create_todo_items(req: Request, ctx: web.Context) -> Response {
+fn create_todo_items(req: Request, ctx: Context) -> Response {
   use form <- wisp.require_form(req)
 
   let result = {
@@ -62,7 +66,7 @@ fn create_todo_items(req: Request, ctx: web.Context) -> Response {
       "todo_item_title",
     ))
 
-    Ok(sql.create_todo(ctx.db, todo_item_title))
+    Ok(sql.create_todo(db_conn(ctx), todo_item_title))
   }
 
   case result {
@@ -77,13 +81,12 @@ fn create_todo_items(req: Request, ctx: web.Context) -> Response {
 
 fn create_todo_item_completion(
   _req: Request,
-  ctx: web.Context,
+  ctx: Context,
   id: String,
 ) -> Response {
-
   case uuid.from_string(id) {
     Ok(valid_id) -> {
-      let _res = sql.complete_todo(ctx.db, valid_id)
+      let _res = sql.complete_todo(db_conn(ctx), valid_id)
       wisp.redirect("/todos")
     }
     Error(_) -> {
@@ -92,10 +95,14 @@ fn create_todo_item_completion(
   }
 }
 
-fn delete_todo_item(_req: Request, ctx: web.Context, id: String) -> Response {
+fn delete_todo_item(
+  _req: Request,
+  ctx: context.Context,
+  id: String,
+) -> Response {
   case uuid.from_string(id) {
     Ok(valid_id) -> {
-      let _res = sql.delete_todo(ctx.db, valid_id)
+      let _res = sql.delete_todo(db_conn(ctx), valid_id)
       wisp.redirect("/todos")
     }
     Error(_) -> {
@@ -104,8 +111,8 @@ fn delete_todo_item(_req: Request, ctx: web.Context, id: String) -> Response {
   }
 }
 
-fn fetch_todo_items(ctx: web.Context) -> List(todo_item.TodoItem) {
-  let assert Ok(pog.Returned(_rows_count, rows)) = sql.fetch_todos(ctx.db)
+fn fetch_todo_items(ctx: Context) -> List(todo_item.TodoItem) {
+  let assert Ok(pog.Returned(_rows_count, rows)) = sql.fetch_todos(db_conn(ctx))
   list.map(rows, fn(row) {
     let id_str = uuid.to_string(row.id)
 

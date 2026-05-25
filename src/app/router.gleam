@@ -1,20 +1,19 @@
+import app/context.{type Context}
+import app/middleware.{middleware}
 import app/pages
 import app/pages/layout.{layout}
 import app/routes/todo_items_routes.{
   todo_item_completion_handler, todo_item_handler, todo_items_handler,
 }
+import gleam/http.{Get}
 import gleam/string
 import lustre/element
 import wisp.{type Request, type Response}
 
-// https://hexdocs.pm/gleam_stdlib/gleam/string_tree.html
-import app/web
-import gleam/http.{Get}
+pub fn handle_request(req: Request, ctx: Context) -> Response {
+  use req <- middleware(req, ctx)
 
-pub fn handle_request(req: Request, ctx: web.Context) -> Response {
-  use req <- web.middleware(req, ctx)
-
-  wisp.log_debug(string.inspect(req))
+  wisp.log_info(string.inspect(req))
 
   case wisp.path_segments(req) {
     [] -> home_page(req, ctx)
@@ -22,7 +21,7 @@ pub fn handle_request(req: Request, ctx: web.Context) -> Response {
     ["todos", id] -> todo_item_handler(req, ctx, id)
     ["todos"] -> todo_items_handler(req, ctx)
 
-    // Handle Empty Responses -> These are configured by our global middleware
+    //TODO not sure these are necessary
     ["internal-server-error"] -> wisp.internal_server_error()
     ["unprocessable-entity"] -> wisp.unprocessable_content()
     ["method-not-allowed"] -> wisp.method_not_allowed([])
@@ -32,7 +31,7 @@ pub fn handle_request(req: Request, ctx: web.Context) -> Response {
   }
 }
 
-fn home_page(req: Request, _ctx: web.Context) -> Response {
+fn home_page(req: Request, _ctx: Context) -> Response {
   use <- wisp.require_method(req, Get)
 
   let html =
