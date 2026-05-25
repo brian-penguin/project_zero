@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
 
-#Use `up` instead of `all` to migrate just one migration at a time
-gleam run -m cigogne all
+# OLD METHOD
+# Use `up` instead of `all` to migrate just one migration at a time
+# gleam run -m cigogne all
+
+# NOTE: If this fails it's likely you'll need to add "?sslmode=disable" to the url string
+echo "Migrating Development"
+migrate -database ${DATABASE_URL} -path priv/migrations up
+echo "========="
+echo "Migrating Test"
+migrate -database ${DATABASE_URL} -path priv/migrations up

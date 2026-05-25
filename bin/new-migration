@@ -1,2 +1,6 @@
 #!/usr/bin/env bash
-gleam run -m cigogne new --name $1
+
+# Old way
+# gleam run -m cigogne new --name $1
+
+migrate create -ext sql -dir priv/migrations $1
