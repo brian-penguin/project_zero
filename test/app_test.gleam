@@ -1,30 +1,14 @@
-import app/context.{type Context, Context}
 import app/router
-import app/server
-import gleam/erlang/process
 import gleam/http
 import gleam/list
 import gleam/string
-import gleeunit
 import gleeunit/should
+import test_context
 import wisp/simulate
-
-pub fn main() {
-  gleeunit.main()
-}
-
-// TODO: What is this called
-// - I want to call this currying? partial application? Idk the difference?
-fn with_context(testcase: fn(Context) -> tc) -> tc {
-  let db_pool_name = process.new_name("test-db")
-  let context =
-    Context(static_directory: server.static_directory(), db_pool_name:)
-  testcase(context)
-}
 
 // Happy Path for our Homepage
 pub fn get_home_page_test() {
-  use ctx <- with_context
+  let ctx = test_context.get()
   let request = simulate.browser_request(http.Get, "/")
   let response = router.handle_request(request, ctx)
 
@@ -40,7 +24,7 @@ pub fn get_home_page_test() {
 
 // Test that we don't allow random posts
 pub fn post_home_page_test() {
-  use ctx <- with_context
+  let ctx = test_context.get()
   let request = simulate.browser_request(http.Post, "/")
   let response = router.handle_request(request, ctx)
 
@@ -49,7 +33,7 @@ pub fn post_home_page_test() {
 
 // Test that our 404 page works
 pub fn page_not_found_test() {
-  use ctx <- with_context
+  let ctx = test_context.get()
   let request = simulate.browser_request(http.Get, "/nothing-lives-here")
   let response = router.handle_request(request, ctx)
 
@@ -57,7 +41,7 @@ pub fn page_not_found_test() {
 }
 
 pub fn get_stylesheet_test() {
-  use ctx <- with_context
+  let ctx = test_context.get()
   let request = simulate.browser_request(http.Get, "/static/styles.css")
   let response = router.handle_request(request, ctx)
 
@@ -68,7 +52,7 @@ pub fn get_stylesheet_test() {
 }
 
 pub fn get_javascript_test() {
-  use ctx <- with_context
+  let ctx = test_context.get()
   let request = simulate.browser_request(http.Get, "/static/main.js")
   let response = router.handle_request(request, ctx)
 

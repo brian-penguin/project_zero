@@ -1,2 +1,4 @@
 #!/usr/bin/env bash
+source .env
+
 gleam test
