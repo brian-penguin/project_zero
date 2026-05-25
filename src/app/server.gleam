@@ -16,19 +16,19 @@ import wisp/wisp_mist
 
 pub fn start(wrap_reload) {
   wisp.configure_logger()
+
   let assert Ok(secret_key_base) = envoy.get("SECRET_KEY_BASE")
   let assert Ok(process_name_str) = envoy.get("DATABASE_PROCESS_NAME")
-  let process_name = process.new_name(process_name_str)
+  let db_process_name = process.new_name(process_name_str)
 
-  let db_pool_child = configure_db_pool_child(process_name)
+  let db_pool_child = configure_db_pool_child(db_process_name)
   let assert Ok(_) = start_application_supervisor(db_pool_child)
 
   let ctx =
     Context(
       static_directory: static_directory(),
       todo_items: [],
-      // TODO  BRIAN QUESTION: should just pass the pool connection or the pool name, is there a cost difference?
-      db_pool_name: process_name,
+      db: pog.named_connection(db_process_name),
     )
 
   let port_str = result.unwrap(envoy.get("PORT"), "8000")
@@ -52,7 +52,7 @@ pub fn static_directory() -> String {
   priv_directory <> "/static"
 }
 
-pub fn configure_db_pool_child(pool_name: process.Name(pog.Message)) {
+fn configure_db_pool_child(pool_name: process.Name(pog.Message)) {
   let assert Ok(pog_config) = read_db_connection_url(pool_name)
 
   pog_config
@@ -66,7 +66,7 @@ fn start_application_supervisor(db_pool_child) {
   |> static_supervisor.start
 }
 
-pub fn read_db_connection_url(
+fn read_db_connection_url(
   name: process.Name(pog.Message),
 ) -> Result(pog.Config, Nil) {
   use database_url <- result.try(envoy.get("DATABASE_URL"))

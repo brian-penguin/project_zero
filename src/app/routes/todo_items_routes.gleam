@@ -54,7 +54,6 @@ fn todo_items_page(req: Request, ctx: web.Context) -> Response {
 
 fn create_todo_items(req: Request, ctx: web.Context) -> Response {
   use form <- wisp.require_form(req)
-  let db = pog.named_connection(ctx.db_pool_name)
 
   let result = {
     use todo_item_title <- result.try(list.key_find(
@@ -62,7 +61,7 @@ fn create_todo_items(req: Request, ctx: web.Context) -> Response {
       "todo_item_title",
     ))
 
-    Ok(sql.create_todo(db, todo_item_title))
+    Ok(sql.create_todo(ctx.db, todo_item_title))
   }
 
   case result {
@@ -80,11 +79,10 @@ fn create_todo_item_completion(
   ctx: web.Context,
   id: String,
 ) -> Response {
-  let db = pog.named_connection(ctx.db_pool_name)
 
   case uuid.from_string(id) {
     Ok(valid_id) -> {
-      let _res = sql.complete_todo(db, valid_id)
+      let _res = sql.complete_todo(ctx.db, valid_id)
       wisp.redirect("/todos")
     }
     Error(_) -> {
@@ -94,11 +92,9 @@ fn create_todo_item_completion(
 }
 
 fn delete_todo_item(_req: Request, ctx: web.Context, id: String) -> Response {
-  let db = pog.named_connection(ctx.db_pool_name)
-
   case uuid.from_string(id) {
     Ok(valid_id) -> {
-      let _res = sql.delete_todo(db, valid_id)
+      let _res = sql.delete_todo(ctx.db, valid_id)
       wisp.redirect("/todos")
     }
     Error(_) -> {
@@ -108,9 +104,7 @@ fn delete_todo_item(_req: Request, ctx: web.Context, id: String) -> Response {
 }
 
 fn fetch_todo_items(ctx: web.Context) -> List(todo_item.TodoItem) {
-  let db = pog.named_connection(ctx.db_pool_name)
-
-  let assert Ok(pog.Returned(_rows_count, rows)) = sql.fetch_todos(db)
+  let assert Ok(pog.Returned(_rows_count, rows)) = sql.fetch_todos(ctx.db)
   list.map(rows, fn(row) {
     let id_str = uuid.to_string(row.id)
 

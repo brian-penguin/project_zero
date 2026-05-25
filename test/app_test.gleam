@@ -8,6 +8,7 @@ import gleam/string
 import gleeunit
 import gleeunit/should
 import wisp/simulate
+import pog
 
 pub fn main() {
   gleeunit.main()
@@ -17,11 +18,12 @@ pub fn main() {
 // - I want to call this currying? partial application? Idk the difference?
 fn with_context(testcase: fn(Context) -> tc) -> tc {
   let db_process_name = process.new_name("test-db")
+  let db = pog.named_connection(db_process_name)
   let context =
     Context(
       static_directory: server.static_directory(),
       todo_items: [],
-      db_pool_name: db_process_name,
+      db: db
     )
   testcase(context)
 }
