@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-gleam run -m olive
+gleam dev

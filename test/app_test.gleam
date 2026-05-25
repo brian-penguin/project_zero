@@ -1,25 +1,25 @@
 import app/router
 import app/web.{type Context, Context}
+import app/server
 import gleam/erlang/process
 import gleam/http
 import gleam/list
 import gleam/string
 import gleeunit
 import gleeunit/should
-import project_zero
 import wisp/simulate
 
 pub fn main() {
   gleeunit.main()
 }
 
-// TODO: What is this called?
+// TODO: What is this called
 // - I want to call this currying? partial application? Idk the difference?
 fn with_context(testcase: fn(Context) -> tc) -> tc {
   let db_process_name = process.new_name("test-db")
   let context =
     Context(
-      static_directory: project_zero.static_directory(),
+      static_directory: server.static_directory(),
       todo_items: [],
       db_pool_name: db_process_name,
     )
