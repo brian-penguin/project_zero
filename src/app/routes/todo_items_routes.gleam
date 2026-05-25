@@ -21,7 +21,8 @@ pub fn todo_items_handler(req: Request, ctx: web.Context) -> Response {
 }
 
 pub fn todo_item_handler(req: Request, ctx: web.Context, id: String) -> Response {
-  // - I think I want to have a put/patch in here somewhere which might mean overriding the form's _method
+  // TODO I think I want to have a put/patch in here somewhere which might mean overriding the form's _method
+  // - this should work with our current middleware no problem
   case req.method {
     Get -> todo_items_page(req, ctx)
     Post -> create_todo_items(req, ctx)

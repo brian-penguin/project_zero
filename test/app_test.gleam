@@ -22,7 +22,6 @@ fn with_context(testcase: fn(Context) -> tc) -> tc {
   let context =
     Context(
       static_directory: server.static_directory(),
-      todo_items: [],
       db: db
     )
   testcase(context)

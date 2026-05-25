@@ -1,13 +1,9 @@
-import app/models/todo_item.{type TodoItem}
 import pog
 import wisp
 
 pub type Context {
-  // This type contains all the "Context" we need to perform a request
-  // in the future it might also contain a database connection pool or cache key
   Context(
     static_directory: String,
-    todo_items: List(TodoItem),
     db: pog.Connection,
   )
 }

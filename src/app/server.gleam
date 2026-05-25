@@ -27,7 +27,6 @@ pub fn start(wrap_reload) {
   let ctx =
     Context(
       static_directory: static_directory(),
-      todo_items: [],
       db: pog.named_connection(db_process_name),
     )
 
