@@ -14,7 +14,7 @@ bin/test  # Run the tests
 ```
 
 To make a new migration and generate the sql automatically we are using a couple of different libraries
-golang-migrate to manage migrations, Pog to do the sql interfacing, and Squirell to auto generate the decoders
+golang-migrate to manage migrations, Pog to do the sql interfacing, and Squirell to auto generate the decoders https://github.com/golang-migrate/migrate
 
 the `migrate` cli tool comes from this package. I haven't yet figured out how to manage that in production so we shall see
 ```sh

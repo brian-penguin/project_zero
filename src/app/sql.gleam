@@ -1,6 +1,6 @@
 //// This module contains the code to run the sql queries defined in
 //// `./src/app/sql`.
-//// > 🐿️ This module was generated automatically using v4.4.2 of
+//// > 🐿️ This module was generated automatically using v4.6.0 of
 //// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ////
 
@@ -13,7 +13,7 @@ import youid/uuid.{type Uuid}
 /// Runs the `complete_todo` query
 /// defined in `./src/app/sql/complete_todo.sql`.
 ///
-/// > 🐿️ This function was generated automatically using v4.4.2 of
+/// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub fn complete_todo(
@@ -30,19 +30,32 @@ pub fn complete_todo(
   |> pog.execute(db)
 }
 
+/// A row you get from running the `create_todo` query
+/// defined in `./src/app/sql/create_todo.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v4.6.0 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type CreateTodoRow {
+  CreateTodoRow(id: Uuid)
+}
+
 /// Runs the `create_todo` query
 /// defined in `./src/app/sql/create_todo.sql`.
 ///
-/// > 🐿️ This function was generated automatically using v4.4.2 of
+/// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub fn create_todo(
   db: pog.Connection,
   arg_1: String,
-) -> Result(pog.Returned(Nil), pog.QueryError) {
-  let decoder = decode.map(decode.dynamic, fn(_) { Nil })
+) -> Result(pog.Returned(CreateTodoRow), pog.QueryError) {
+  let decoder = {
+    use id <- decode.field(0, uuid_decoder())
+    decode.success(CreateTodoRow(id:))
+  }
 
-  "INSERT INTO todo_items (title) VALUES ($1)
+  "INSERT INTO todo_items (title) VALUES ($1) RETURNING id;
 "
   |> pog.query
   |> pog.parameter(pog.text(arg_1))
@@ -53,7 +66,7 @@ pub fn create_todo(
 /// Runs the `delete_todo` query
 /// defined in `./src/app/sql/delete_todo.sql`.
 ///
-/// > 🐿️ This function was generated automatically using v4.4.2 of
+/// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub fn delete_todo(
@@ -73,7 +86,7 @@ pub fn delete_todo(
 /// A row you get from running the `fetch_todos` query
 /// defined in `./src/app/sql/fetch_todos.sql`.
 ///
-/// > 🐿️ This type definition was generated automatically using v4.4.2 of the
+/// > 🐿️ This type definition was generated automatically using v4.6.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type FetchTodosRow {
@@ -83,7 +96,7 @@ pub type FetchTodosRow {
 /// Runs the `fetch_todos` query
 /// defined in `./src/app/sql/fetch_todos.sql`.
 ///
-/// > 🐿️ This function was generated automatically using v4.4.2 of
+/// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub fn fetch_todos(

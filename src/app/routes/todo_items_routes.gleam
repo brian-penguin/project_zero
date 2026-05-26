@@ -12,24 +12,22 @@ import pog
 import wisp.{type Request, type Response}
 import youid/uuid
 
+// Handles the /todos/ routes
 pub fn todo_items_handler(req: Request, ctx: Context) -> Response {
   case req.method {
-    Get -> todo_items_page(req, ctx)
-    Post -> create_todo_items(req, ctx)
+    Get -> todo_items_index(req, ctx)
+    Post -> create_todo_item(req, ctx)
     _ -> wisp.method_not_allowed(allowed: [Get, Post])
   }
 }
 
-pub fn todo_item_handler(
-  req: Request,
-  ctx: Context,
-  id: String,
-) -> Response {
+// Handles the /todo/ routes
+pub fn todo_item_handler(req: Request, ctx: Context, id: String) -> Response {
   // TODO I think I want to have a put/patch in here somewhere which might mean overriding the form's _method
   // - this should work with our current middleware no problem
   case req.method {
-    Get -> todo_items_page(req, ctx)
-    Post -> create_todo_items(req, ctx)
+    Get -> todo_items_index(req, ctx)
+    Post -> create_todo_item(req, ctx)
     Delete -> delete_todo_item(req, ctx, id)
     _ -> wisp.method_not_allowed(allowed: [Get, Post, Delete])
   }
@@ -46,7 +44,7 @@ pub fn todo_item_completion_handler(
   }
 }
 
-fn todo_items_page(req: Request, ctx: Context) -> Response {
+fn todo_items_index(req: Request, ctx: Context) -> Response {
   use <- wisp.require_method(req, Get)
 
   let html =
@@ -57,7 +55,7 @@ fn todo_items_page(req: Request, ctx: Context) -> Response {
   |> wisp.html_body(html)
 }
 
-fn create_todo_items(req: Request, ctx: Context) -> Response {
+fn create_todo_item(req: Request, ctx: Context) -> Response {
   use form <- wisp.require_form(req)
 
   let result = {
@@ -79,11 +77,7 @@ fn create_todo_items(req: Request, ctx: Context) -> Response {
   }
 }
 
-fn create_todo_item_completion(
-  _req: Request,
-  ctx: Context,
-  id: String,
-) -> Response {
+fn create_todo_item_completion(_req: Request, ctx: Context, id: String) -> Response {
   case uuid.from_string(id) {
     Ok(valid_id) -> {
       let _res = sql.complete_todo(db_conn(ctx), valid_id)
@@ -116,6 +110,6 @@ fn fetch_todo_items(ctx: Context) -> List(todo_item.TodoItem) {
   list.map(rows, fn(row) {
     let id_str = uuid.to_string(row.id)
 
-    todo_item.create_todo_item(option.Some(id_str), row.title, row.completed_at)
+    todo_item.build(option.Some(id_str), row.title, row.completed_at)
   })
 }

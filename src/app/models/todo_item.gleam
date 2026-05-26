@@ -11,7 +11,7 @@ pub type TodoItem {
   TodoItem(id: String, title: String, status: TodoItemStatus)
 }
 
-pub fn create_todo_item(
+pub fn build(
   id: Option(String),
   title: String,
   completed_at: Option(timestamp.Timestamp),

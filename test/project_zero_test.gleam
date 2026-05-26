@@ -8,6 +8,5 @@ pub fn main() {
 }
 
 pub fn hello_world_test() {
-  1
-  |> should.equal(1)
+  1 |> should.equal(1)
 }
