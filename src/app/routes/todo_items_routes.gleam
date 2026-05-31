@@ -1,4 +1,4 @@
-import app/context.{type Context, db_conn}
+import app/context.{type Context}
 import app/models/todo_item
 import app/pages
 import app/pages/layout.{layout}
@@ -64,7 +64,7 @@ fn create_todo_item(req: Request, ctx: Context) -> Response {
       "todo_item_title",
     ))
 
-    Ok(sql.create_todo(db_conn(ctx), todo_item_title))
+    Ok(sql.create_todo(ctx.db_conn, todo_item_title))
   }
 
   case result {
@@ -80,7 +80,7 @@ fn create_todo_item(req: Request, ctx: Context) -> Response {
 fn create_todo_item_completion(_req: Request, ctx: Context, id: String) -> Response {
   case uuid.from_string(id) {
     Ok(valid_id) -> {
-      let _res = sql.complete_todo(db_conn(ctx), valid_id)
+      let _res = sql.complete_todo(ctx.db_conn, valid_id)
       wisp.redirect("/todos")
     }
     Error(_) -> {
@@ -96,7 +96,7 @@ fn delete_todo_item(
 ) -> Response {
   case uuid.from_string(id) {
     Ok(valid_id) -> {
-      let _res = sql.delete_todo(db_conn(ctx), valid_id)
+      let _res = sql.delete_todo(ctx.db_conn, valid_id)
       wisp.redirect("/todos")
     }
     Error(_) -> {
@@ -106,7 +106,7 @@ fn delete_todo_item(
 }
 
 fn fetch_todo_items(ctx: Context) -> List(todo_item.TodoItem) {
-  let assert Ok(pog.Returned(_rows_count, rows)) = sql.fetch_todos(db_conn(ctx))
+  let assert Ok(pog.Returned(_rows_count, rows)) = sql.fetch_todos(ctx.db_conn)
   list.map(rows, fn(row) {
     let id_str = uuid.to_string(row.id)
 

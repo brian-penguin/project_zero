@@ -34,8 +34,8 @@ pub fn with_rollback(
   next: fn(context.Context) -> Nil,
 ) -> Nil {
   let _ =
-    pog.transaction(context.db_conn(ctx), fn(db_conn) {
-      next(context.TestContext(static_directory: ctx.static_directory, db_conn:))
+    pog.transaction(ctx.db_conn, fn(db_conn) {
+      next(context.Context(static_directory: ctx.static_directory, db_conn:))
       Error("roll it back")
     })
   Nil

@@ -1,4 +1,3 @@
-import app/context
 import app/router
 import app/sql
 import gleam/http
@@ -16,9 +15,7 @@ pub fn get_todo_items_index_test() {
   let ctx = test_context.get()
   use ctx <- test_database.with_rollback(ctx)
 
-  let db_conn = context.db_conn(ctx)
-
-  let assert Ok(_todo_item) = sql.create_todo(db_conn, "Hello World")
+  let assert Ok(_todo_item) = sql.create_todo(ctx.db_conn, "Hello World")
 
   let request = simulate.browser_request(http.Get, "/todos")
   let response = router.handle_request(request, ctx)
@@ -34,12 +31,10 @@ pub fn get_todo_item_index_test() {
   let ctx = test_context.get()
   use ctx <- test_database.with_rollback(ctx)
 
-  let db_conn = context.db_conn(ctx)
-
   let assert Ok(pog.Returned(_row_count, rows)) =
-    sql.create_todo(db_conn, "Hello World")
+    sql.create_todo(ctx.db_conn, "Hello World")
 
-  let id = case list.first(rows) {
+  let _id = case list.first(rows) {
     Ok(row) -> uuid.to_string(row.id)
     Error(_) -> ""
   }

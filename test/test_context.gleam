@@ -1,4 +1,4 @@
-import app/context.{type Context, TestContext}
+import app/context.{type Context}
 import app/server
 import gleam/erlang/process
 import pog
@@ -10,5 +10,6 @@ pub fn get() -> Context {
   let db_pool_name = test_database.db_pool_name()
   let assert Ok(_) = process.named(db_pool_name)
   let db_conn = pog.named_connection(db_pool_name)
-  TestContext(static_directory:, db_conn:)
+
+  context.Context(static_directory:, db_conn:)
 }

@@ -22,8 +22,10 @@ pub fn start(wrap_reload) {
   let db_pool_child = configure_db_pool_child(db_pool_name)
   let assert Ok(_) = start_application_supervisor(db_pool_child)
 
+  let db_conn = pog.named_connection(db_pool_name)
+
   let ctx =
-    Context(static_directory: static_directory(), db_pool_name: db_pool_name)
+    Context(static_directory: static_directory(), db_conn: )
 
   let port_str = result.unwrap(envoy.get("PORT"), "8000")
   let assert Ok(port) = int.parse(port_str)
